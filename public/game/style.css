@@ -1,0 +1,185 @@
+div{
+	height:50px;
+	width:50px;
+	position: absolute;
+/*	position: relative;*/
+	transition: all 1s;
+}
+img{
+    transition: all 1s;
+	position: absolute; 
+	/*z-index: 1000;*/
+	width:50px;
+	height:50px;
+	/*visibility: hidden;*/
+	/*//display:inline-block;*/
+/*	left:60px;
+	top:60px;*/
+}
+
+div.game-object{
+	height:54px;
+	width:54px;
+	position: absolute;
+	transition: all 1s;
+    background-color: red;
+}
+
+div.game-object img{
+    width: 46px;
+    height: 46px;
+    left: 4px;
+    top: 5px;
+    z-index: 99;
+}
+
+#but  {
+	position: absolute;
+	top:700px;
+
+}
+
+#txt {
+
+	position: absolute;
+	top:700px;
+    left:110px;
+	display:inline-block;
+}
+
+/*#buyTower {
+
+	position: absolute;
+	top:700px;
+    left:310px;
+	display:inline-block;
+}*/
+
+#putTower {
+
+	position: absolute;
+	top:700px;
+    left:430px;
+	display:inline-block;
+}
+
+
+/*#buyPlace {
+
+	position: absolute;
+	top:730px;
+    left:310px;
+	display:inline-block;
+}*/
+
+#putPlace {
+
+	position: absolute;
+	top:730px;
+    left:430px;
+	display:inline-block;
+}
+
+#tower {
+	position: absolute;
+	top:700px;
+    left:570px;
+	display:inline-block;
+}
+
+#place {
+	position: absolute;
+	top:730px;
+    left:570px;
+	display:inline-block;
+}
+
+#Gold {
+	position: absolute;
+	bottom:10%;
+    left:10px;
+	display:inline-block;
+}
+
+#player {
+	 position: absolute;
+	 bottom:17%;
+	 left:10px;
+	 display:inline-block;
+	 padding: 10px;
+	 color: white;
+ }
+
+#castle {
+	position: absolute;
+	bottom:5%;
+	left:10px;
+	display:inline-block;
+	color: black;
+}
+
+#ololo {
+	
+   /* -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    -khtml-border-radius: 6px;*/
+}
+
+#ololo > div{
+	lefYt:0px;
+	toYp:0px;
+	width: 12px;
+    height: 12px;
+    background: #FF0000;
+    border-radius: 6px;
+    transition: all 1s;
+
+}
+
+#hp {
+	position: absolute;
+	top:760px;
+    left:110px;
+	display:inline-block;
+}
+
+select {
+	left:1000px;
+	position: absolute;
+}
+
+.hp-strike {
+    width: 110%;
+    height: 4px;
+    bottom: -3px;
+    left: -6%;
+    border: 1px solid grey;
+    z-index: 101;
+}
+
+.hp-strike div{
+    background: #2dcf2d;
+    height: 100%;
+}
+
+#controller {
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 200px;
+	height: 100%;
+	border: 1px solid grey;
+	background-color: rgba(255,255,255, 0.8);
+	z-index: 99999;
+}
+
+#controller input {
+	margin-top: 20px;
+	margin-left: 10px;
+}
+
+#listbox{
+	top:750px;
+	left:500px;
+	width:200px;
+}
