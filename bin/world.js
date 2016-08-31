@@ -226,7 +226,6 @@ function World(width, height){
             if (!this.passiveGold){return;}
             for (var i=0;i<this.passiveGold.length;i++) {
                 var player = findObjectInArray(players, 'id', this.playerId);
-                console.log(this.passiveGold[i].type);
                 player[this.passiveGold[i].type] = player[this.passiveGold[i].type] + this.passiveGold[i].amount;
             }
         }
