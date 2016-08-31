@@ -312,7 +312,7 @@ function VIEW(){
 					break;
 
 				case 'BLOCK' :
-					//masM[object.coord[0]][object.coord[1]].style.backgroundColor="black";
+					masM[object.coord[0]][object.coord[1]].style.backgroundColor="black";
 				break;
 
 				case 'CASTLE':

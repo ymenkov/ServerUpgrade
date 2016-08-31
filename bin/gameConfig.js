@@ -40,7 +40,7 @@ module.exports = [{
 }, {
 	"type": "TOWER",
 	"hp": 1000,
-	"price": 200,
+	"price": 500,
 	"moveTargets": false,
 	"attackTargets": ["ORK","HUNTER","TROLL","CASTLE","KAMIKADZE"],
 	"damage": 250,
