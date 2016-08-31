@@ -121,7 +121,9 @@ function VIEW(){
 		'TROLL': 'troll.png',
 		'ST' : 'st.png',
 		'WALL' : 'wall.png',
-		'WALLKILLER': 'WALLKILLER.png'
+		'WALLKILLER': 'WALLKILLER.png',
+		'BANK': 'BANK.png',
+		'KAMIKADZE': 'KAMIKADZE.png',
 	};
 
 	var colors = [
