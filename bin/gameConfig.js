@@ -17,7 +17,7 @@ module.exports = [{
 }, {
 	"type": "BANK",
 	"hp": 100000,
-	"price": 3000,
+	"price": 3,
 	"moveTargets": false,
 	"attackTargets": [],
 	"damage": 0,
@@ -25,13 +25,13 @@ module.exports = [{
 	"attackSpeed": 0,
 	"attackRadius": 0,
 	"block": true,
-	"passiveGold":1
+	"passiveGold":[{type:"gold",amount:0.02}]
 },{
 	"type": "ORK",
 	"hp": 1000,
 	"price": 200,
-	"moveTargets": ["CASTLE", "HUNTER","ORK", "TROLL"],
-	"attackTargets": ["CASTLE", "HUNTER","ORK", "TROLL"],
+	"moveTargets": ["CASTLE", "HUNTER","ORK", "TROLL","TOWER"],
+	"attackTargets": ["CASTLE", "HUNTER","ORK", "TROLL","TOWER"],
 	"damage": 50,
 	"moveSpeed": 1,
 	"attackSpeed": 1,
@@ -137,4 +137,16 @@ module.exports = [{
 	"attackSpeed": 2,
 	"attackRadius": 2,
 	"block": false,
+},{
+	"type": "HEALMAN",
+	"hp": 500,
+	"price": 3,
+	"moveTargets": ["TOWER"],
+	"attackTargets": ["TOWER"],
+	"damage": -500,
+	"moveSpeed": 10,
+	"attackSpeed": 2,
+	"attackRadius": 2,
+	"block": false,
+	"attackOrHeal": true
 }];

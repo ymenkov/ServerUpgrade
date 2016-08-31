@@ -116,8 +116,10 @@ function World(width, height){
         this.coord=coordinate; // координаты объекта
         this.playerId = playerId;
         this.attackTarget = false;
-
         cloneObject(this, [config]);
+        if (!this.attackOrHeal){this.attackOrHeal=false;}
+        this.maxHp=this.hp;
+
         // this.hp=config.hp;
         // this.moveTargets=config.moveTargets;
         // this.attackTargets=config.attackTargets || [];
@@ -167,9 +169,14 @@ function World(width, height){
         this.getMoveTargets = function(all_obj){
             var targets = [];
             if(!this.moveTargets)return [];
-            for(var i =0; i<all_obj.length; i++)
-                if(~this.moveTargets.indexOf(all_obj[i].type) && this.playerId != all_obj[i].playerId)
-                    targets.push({ coord: all_obj[i].coord, hp: all_obj[i].hp });
+            for(var i =0; i<all_obj.length; i++) {
+                if (~this.moveTargets.indexOf(all_obj[i].type) && ((this.playerId != all_obj[i].playerId) != this.attackOrHeal)) {
+                    if ((this.attackOrHeal==true)&&(all_obj[i].hp>=all_obj[i].maxHp)){}else{
+                        targets.push({coord: all_obj[i].coord, hp: all_obj[i].hp});
+                    }
+                }
+
+            }
             return targets.filter(function(target){
                 return target.hp!="del";
             });
@@ -183,9 +190,17 @@ function World(width, height){
                 var attackTargets=gameObj.getAttackTarget(all_obj,gameObj.attackTargets,gameObj.attackRadius,1,gameObj.coord);
 
                 attackTargets.forEach(function(target){
+                    if ((target.hp>=target.maxHp)&&(this.attackOrHeal)){
+                        target.hp=target.maxHp;
+                        return;
+                    }
                     target.hp-=gameObj.damage;
+                    if ((target.hp>target.maxHp)&&(this.attackOrHeal)) {
+                        target.hp = target.maxHp;
+                    }
+
                     gameObj.attackTarget = target.id;
-                    if (target.hp<=0){
+                    if ((target.hp<=0)&&(this.attackOrHeal==false)){
                         //if (target.type=="CASTLE") {dieAllObject(target.player_id);}
                         target.hp="del";
                         var kar=0;
@@ -204,6 +219,8 @@ function World(width, height){
                         var player = findObjectInArray(players, 'id', gameObj.playerId);
                         if (player) player.gold += target.price/4;
                     }
+
+
                 }.bind(this));
                 delete attackTargets;
 
@@ -230,6 +247,8 @@ function World(width, height){
             }
         }
 
+
+
         this.getAttackTarget = function(all_obj,attackTypes,radius,targetNumb,coord){
             var gameObj = this;
 
@@ -238,18 +257,18 @@ function World(width, height){
             targets = all_obj.filter(function(target){
                 return ~attackTypes.indexOf(target.type);
             })
-
             targets = targets.filter(function(target){
                 if (((Math.abs(target.coord[0]-coord[0]))<radius)&&((Math.abs(target.coord[1]-coord[1]))<radius)){
                     return true;
                 }
                 return false;
             })
-
             targets = targets.filter(function(target){
-                return target.hp!="del" && target.playerId!=gameObj.playerId;
+                if ((gameObj.attackOrHeal==true)&&(gameObj.hp>=gameObj.maxHp)){
+                    return [];
+                }
+                return (target.hp!="del" && ((target.playerId!=gameObj.playerId)!=gameObj.attackOrHeal));
             })
-
             return targets.slice(0,targetNumb);
         }
 
