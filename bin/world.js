@@ -224,8 +224,10 @@ function World(width, height){
 
         this.craft=function(all_obj){
             if (!this.passiveGold){return;}
-            var player = findObjectInArray(players, 'id', this.playerId);
-            player.gold=player.gold+this.passiveGold;
+            for (var i=0;i<this.passiveGold.length;i++) {
+                var player = findObjectInArray(players, 'id', this.playerId);
+                player[this.passiveGold[i].type] = player[this.passiveGold[i].type] + this.passiveGold[i].amount;
+            }
         }
 
         this.getAttackTarget = function(all_obj,attackTypes,radius,targetNumb,coord){
@@ -330,7 +332,7 @@ function World(width, height){
     me.upLvl=function(mes){
         var player = findObjectInArray(players, 'id', mes.player_id);
         var object = findObjectInArray(all_obj, 'id', mes.id);
-
+        if (mes.player_id!=object.playerId){return;}
         var number = findObjectInArray(object.lvlInfo, "upgrade", mes.upgrade);
         if (!object.lvlInfo){return;}
         if ((number.lvl<number.maxLvl) && (player.gold >= number.price)){
