@@ -202,7 +202,6 @@ function VIEW(){
 
 					var elem1=document.createElement("option");
 					elem1.innerHTML=this.lvlInfo[i].upgrade+' '+this.lvlInfo[i].lvl+'/'+this.lvlInfo[i].maxLvl;
-
 					elem1.onclick=upgrade.bind(this.lvlInfo[i]);
 
 					function upgrade(){

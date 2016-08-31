@@ -12,7 +12,8 @@ module.exports = [{
 	"block": true,
 	"spawnInterval": 30,
 	"spawnType":"ORK",
-	"passiveGold":0.1
+	"passiveGold":[{type:"gold",amount:0.1}],
+	"lvlInfo":[{"lvl": 1,"upgrade": "damage","step": 50,"maxLvl": 3,"price": 100}]
 }, {
 	"type": "ORK",
 	"hp": 1000,
