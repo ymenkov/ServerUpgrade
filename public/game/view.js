@@ -198,7 +198,7 @@ function VIEW(){
 				selectForUpgrade={id:this.id};
 				var elem=document.getElementById("listbox");
 				elem.innerHTML="";
-				for (var i=0;i<=this.lvlInfo.length-1;i++){
+				for (var i=0;i<this.lvlInfo.length;i++){
 
 					var elem1=document.createElement("option");
 					elem1.innerHTML=this.lvlInfo[i].upgrade+' '+this.lvlInfo[i].lvl+'/'+this.lvlInfo[i].maxLvl;
@@ -284,7 +284,7 @@ function VIEW(){
 			switch (object.type){
 				case 'PLAYER':
 					var t = document.getElementById("Gold");
-					t.innerHTML = "Gold : "+object.gold;
+					t.innerHTML = "Gold : "+Math.floor(object.gold);
 					var t = document.getElementById("player");
 					t.innerHTML = "Имя: "+object.player_name;
 					t.style.backgroundColor = generateColor(object.player_id);

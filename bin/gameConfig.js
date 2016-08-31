@@ -11,7 +11,8 @@ module.exports = [{
 	"attackRadius": 4,
 	"block": true,
 	"spawnInterval": 30,
-	"coeff":1
+	"spawnType":"ORK",
+	"passiveGold":1
 }, {
 	"type": "ORK",
 	"hp": 1000,

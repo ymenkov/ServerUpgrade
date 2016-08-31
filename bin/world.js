@@ -93,29 +93,49 @@ function World(width, height){
         }
     }
 
+    function cloneObject(me, arr){
+        for(var i=0; i<arr.length; i++){
+            var clone = arr[i];
+            for(param in clone){
+                if(clone.hasOwnProperty(param)) {
+                    if( (typeof clone[param]) == 'object') {
+                        me[param] = clone[param].length? []: {};
+                        cloneObject(me[param], [clone[param]]);
+                    } else {
+                        if (me[param] == undefined)
+                            me[param] = clone[param];
+                    }
+                }
+            }
+        }
+    }
+
     function gameObject(id, type, playerId, coordinate, config){
         this.id=id;
         this.type=type; // тип объекта
         this.coord=coordinate; // координаты объекта
         this.playerId = playerId;
-
-        this.hp=config.hp;
-        this.moveTargets=config.moveTargets;
-        this.attackTargets=config.attackTargets || [];
-        this.damage=config.damage;
-        this.moveSpeed=config.moveSpeed;
-        this.attackSpeed=config.attackSpeed;
-        this.attackRadius = config.attackRadius;
         this.attackTarget = false;
-        this.block=config.block;
-        this.spawnInterval = config.spawnInterval || 0;
-        this.price = config.price;
-        this.lvlInfo=config.lvlInfo;
+
+        cloneObject(this, [config]);
+        // this.hp=config.hp;
+        // this.moveTargets=config.moveTargets;
+        // this.attackTargets=config.attackTargets || [];
+        // this.damage=config.damage;
+        // this.moveSpeed=config.moveSpeed;
+        // this.attackSpeed=config.attackSpeed;
+        // this.attackRadius = config.attackRadius;
+        // this.attackTarget = false;
+        // this.block=config.block;
+        // this.spawnInterval = config.spawnInterval || 0;
+        // this.price = config.price;
+        // this.lvlInfo=config.lvlInfo;
 
 
 
         this.attackCoolDown = (1000/this.attackSpeed).toFixed(0);
         this.moveCoolDown = (1000/this.moveSpeed).toFixed(0);
+
 
         this.move = function(all_obj){
             if(!this.moveTargets) return;
@@ -146,6 +166,7 @@ function World(width, height){
 
         this.getMoveTargets = function(all_obj){
             var targets = [];
+            if(!this.moveTargets)return [];
             for(var i =0; i<all_obj.length; i++)
                 if(~this.moveTargets.indexOf(all_obj[i].type) && this.playerId != all_obj[i].playerId)
                     targets.push({ coord: all_obj[i].coord, hp: all_obj[i].hp });
@@ -190,9 +211,28 @@ function World(width, height){
 
 
         }
+        this.spawn=this.spawnInterval;
+        this.spawnObjects=function(all_obj){
+            if (!this.spawnInterval){return;}
+            if (this.spawn==this.spawnInterval) {
+                me.createObject(this.spawnType, this.playerId, this.coord);
+                this.spawn=0;
+                return;
+            }
+            this.spawn++;
+        }
+
+        this.craft=function(all_obj){
+            if (!this.passiveGold){return;}
+            var player = findObjectInArray(players, 'id', this.playerId);
+            player.gold=player.gold+0.1;
+        }
 
         this.getAttackTarget = function(all_obj,attackTypes,radius,targetNumb,coord){
             var gameObj = this;
+
+            if(!attackTypes.indexOf)return [];
+
             targets = all_obj.filter(function(target){
                 return ~attackTypes.indexOf(target.type);
             })
@@ -210,6 +250,8 @@ function World(width, height){
 
             return targets.slice(0,targetNumb);
         }
+
+
     }
 
     me.buyObject = function(type, playerId, coord){
@@ -242,10 +284,8 @@ function World(width, height){
             if(game_Object.hp!='del') {
                 game_Object.move.call(game_Object, all_obj);
                 game_Object.attack.call(game_Object, all_obj);
-
-                if (game_Object.type == "CASTLE") {
-                    me.createOrks.call(game_Object, game_Object.playerId);
-                }
+                game_Object.spawnObjects.call(game_Object, all_obj);
+                game_Object.craft.call(game_Object, all_obj)
             }
         });
     }

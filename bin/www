@@ -131,7 +131,7 @@ webSocketServer.on('connection', function(ws) {
           case 'start':
               if(playerId === 0)
                 w.startWorld();
-                 passiveGold()
+
                     for (var i=0;i<=clients.length-1;i++){
                     clients[i].ws.send(JSON.stringify({type:"EVENT",info:"Игра начала / ускорилась"}));
                     }
@@ -179,23 +179,4 @@ setInterval(function () {
     });
 }, 300);
 
-function passiveGold() {
-    setInterval(function () {
-        function findObjectInArray(array, param, value) {
-            for (var i = 0; i < array.length; i++)
-                if (array[i][param] == value)
-                    return array[i];
-            return false;
-        }
-
-        var all_obj = w.setAllObj();
-        var players = w.setPlayers();
-        for (var i = 0; i <= all_obj.length - 1; i++) {
-            if ((all_obj[i].type == "CASTLE") && (all_obj[i].hp != "del")) {
-                var player = findObjectInArray(players, 'id', all_obj[i].playerId);
-                player.gold = player.gold + 1;
-            }
-        }
-    }, 1000);
-}
 
