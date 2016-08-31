@@ -12,7 +12,7 @@ module.exports = [{
 	"block": true,
 	"spawnInterval": 30,
 	"spawnType":"ORK",
-	"passiveGold":1
+	"passiveGold":0.1
 }, {
 	"type": "ORK",
 	"hp": 1000,

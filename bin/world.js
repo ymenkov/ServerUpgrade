@@ -225,7 +225,7 @@ function World(width, height){
         this.craft=function(all_obj){
             if (!this.passiveGold){return;}
             var player = findObjectInArray(players, 'id', this.playerId);
-            player.gold=player.gold+0.1;
+            player.gold=player.gold+this.passiveGold;
         }
 
         this.getAttackTarget = function(all_obj,attackTypes,radius,targetNumb,coord){
