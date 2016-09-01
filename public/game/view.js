@@ -124,6 +124,7 @@ function VIEW(){
 		'WALLKILLER': 'WALLKILLER.png',
 		'BANK': 'BANK.png',
 		'KAMIKADZE': 'KAMIKADZE.png',
+		'HEALMAN':'healman.png'
 	};
 
 	var colors = [
@@ -172,7 +173,7 @@ function VIEW(){
 		hp_strike.innerHTML = '';
 
 		if(dom_element.hp){
-			var max_hp = dom_element.max_hp; 
+		    var max_hp = dom_element.max_hp;
 			var hp = document.createElement('div');
 			hp.style.width=((dom_element.hp/max_hp)*hp_strike.clientWidth).toFixed(0) + 'px'; 
 			hp_strike.appendChild(hp);

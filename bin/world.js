@@ -190,16 +190,25 @@ function World(width, height){
                 var attackTargets=gameObj.getAttackTarget(all_obj,gameObj.attackTargets,gameObj.attackRadius,1,gameObj.coord);
 
                 attackTargets.forEach(function(target){
-                    if ((target.hp>=target.maxHp)&&(this.attackOrHeal)){
-                        target.hp=target.maxHp;
-                        return;
-                    }
-                    target.hp-=gameObj.damage;
-                    if ((target.hp>target.maxHp)&&(this.attackOrHeal)) {
-                        target.hp = target.maxHp;
-                    }
 
+                    //heal
+
+
+                     if ((target.hp>=target.maxHp) && (this.attackOrHeal)){
+                         target.hp=target.maxHp;
+                         gameObj.attackTarget=false;
+                         return;
+                     }else if(target.hp=="del"){
+                         gameObj.attackTarget=false;
+                         return;
+                     }
                     gameObj.attackTarget = target.id;
+                    target.hp-=gameObj.damage;
+
+
+                     //heal end
+
+
                     if ((target.hp<=0)&&(this.attackOrHeal==false)){
                         //if (target.type=="CASTLE") {dieAllObject(target.player_id);}
                         target.hp="del";
@@ -363,6 +372,9 @@ function World(width, height){
         if ((number.lvl<number.maxLvl) && (player.gold >= number.price)){
             player.gold-=number.price;
             number.lvl=number.lvl+1;
+
+            if (mes.upgrade=="hp"){object["maxHp"]=object["maxHp"]+number.step;} //говноКод
+
             object[mes.upgrade]=object[mes.upgrade]+number.step;
             console.log(object.id)
         }
