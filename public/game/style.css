@@ -164,7 +164,7 @@ select {
 
 #controller {
 	position: absolute;
-	right: 0;
+	left: 1300px;
 	top: 0;
 	width: 200px;
 	height: 100%;

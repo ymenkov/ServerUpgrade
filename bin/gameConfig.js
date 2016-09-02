@@ -4,7 +4,7 @@ module.exports = [{
 	"hp": 100000,
 	"price": 0,
 	"moveTargets": false,
-	"attackTargets": ["ORK", "HUNTER", "TROLL", "TOWER", "ST", "WALLKILLER", "WALL","KAMIKADZE"],
+	"attackTargets": ["ORK", "HUNTER", "TROLL", "TOWER", "ST", "WALLKILLER", "WALL","KAMIKADZE","HEALMAN"],
 	"damage": 300,
 	"moveSpeed": 0,
 	"attackSpeed": 1,
@@ -13,11 +13,11 @@ module.exports = [{
 	"spawnInterval": 30,
 	"spawnType":"ORK",
 	"passiveGold":[{type:"gold",amount:0.1}],
-	"lvlInfo":[{"lvl": 1,"upgrade": "damage","step": 50,"maxLvl": 3,"price": 100}]
+	"lvlInfo":[{"lvl": 1,"upgrade": "damage","step": 50,"maxLvl": 3,"price": 300},{"lvl": 1,"upgrade": "hp","step": 1000,"maxLvl": 5,"price": 300}]
 }, {
 	"type": "BANK",
 	"hp": 100000,
-	"price": 3,
+	"price": 1500,
 	"moveTargets": false,
 	"attackTargets": [],
 	"damage": 0,
@@ -25,13 +25,13 @@ module.exports = [{
 	"attackSpeed": 0,
 	"attackRadius": 0,
 	"block": true,
-	"passiveGold":[{type:"gold",amount:0.02}]
+	"passiveGold":[{type:"gold",amount:0.35}]
 },{
 	"type": "ORK",
 	"hp": 1000,
 	"price": 200,
-	"moveTargets": ["CASTLE", "HUNTER","ORK", "TROLL","TOWER"],
-	"attackTargets": ["CASTLE", "HUNTER","ORK", "TROLL","TOWER"],
+	"moveTargets": ["CASTLE", "HUNTER","ORK", "TROLL","HEALMAN","WALL"],
+	"attackTargets": ["CASTLE", "HUNTER","ORK", "TROLL","HEALMAN","WALL"],
 	"damage": 50,
 	"moveSpeed": 1,
 	"attackSpeed": 1,
@@ -73,7 +73,7 @@ module.exports = [{
 	"block": false
 },{
 	"type": "WALL",
-	"hp": 1000,
+	"hp": 10000,
 	"price": 30,
 	"moveTargets": false,
 	"attackTargets": [],
@@ -86,8 +86,8 @@ module.exports = [{
 	"type": "HUNTER",
 	"hp": 1000,
 	"price": 250,
-	"moveTargets": ["ORK", "TROLL", "CASTLE","WALLKILLER","KAMIKADZE"],
-	"attackTargets": ["ORK", "TROLL", "CASTLE","WALLKILLER","KAMIKADZE"],
+	"moveTargets": ["ORK", "TROLL","WALLKILLER","KAMIKADZE","BANK"<"WALL"],
+	"attackTargets": ["ORK", "TROLL","WALLKILLER","KAMIKADZE","BANK","WALL"],
 	"damage": 500,
 	"moveSpeed": 2,
 	"attackSpeed": 2,
@@ -108,8 +108,8 @@ module.exports = [{
 	"type": "TROLL",
 	"hp": 10000,
 	"price": 500,
-	"moveTargets": ["TOWER","WALL","ST","CASTLE"],
-	"attackTargets": ["TOWER","WALL","ST","CASTLE"],
+	"moveTargets": ["TOWER","WALL","ST","CASTLE","BANK","spawnerOrks"],
+	"attackTargets": ["TOWER","WALL","ST","CASTLE","BANK","spawnerOrks"],
 	"damage": 200,
 	"moveSpeed": 1,
 	"attackSpeed": 2,
@@ -129,7 +129,7 @@ module.exports = [{
 },{
 	"type": "KAMIKADZE",
 	"hp": 500,
-	"price": 300,
+	"price": 30000,
 	"moveTargets": ["TOWER", "ST", "BANK", "WALL"],
 	"attackTargets": ["TOWER", "ST", "BANK", "WALL"],
 	"damage": 1000,
@@ -140,13 +140,26 @@ module.exports = [{
 },{
 	"type": "HEALMAN",
 	"hp": 500,
-	"price": 3,
-	"moveTargets": ["TOWER"],
-	"attackTargets": ["TOWER"],
-	"damage": -5,
+	"price": 500,
+	"moveTargets": ["TOWER","ST","BANK"],
+	"attackTargets": ["TOWER","ST","BANK"],
+	"damage": -100,
 	"moveSpeed": 2,
 	"attackSpeed": 2,
 	"attackRadius": 2,
 	"block": false,
 	"attackOrHeal": true
+},{
+	"type": "spawnerOrks",
+	"hp": 10000,
+	"price": 10000,
+	"moveTargets": false,
+	"attackTargets": [],
+	"damage": 0,
+	"moveSpeed": 0,
+	"attackSpeed": 0,
+	"attackRadius": 0,
+	"block": true,
+	"spawnInterval": 30,
+	"spawnType":"ORK"
 }];

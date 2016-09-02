@@ -124,7 +124,8 @@ function VIEW(){
 		'WALLKILLER': 'WALLKILLER.png',
 		'BANK': 'BANK.png',
 		'KAMIKADZE': 'KAMIKADZE.png',
-		'HEALMAN':'healman.png'
+		'HEALMAN':'healman.png',
+		'spawnerOrks':"spawnerOrks.png"
 	};
 
 	var colors = [

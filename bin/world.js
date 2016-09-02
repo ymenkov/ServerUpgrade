@@ -84,14 +84,6 @@ function World(width, height){
 
 
 
-    me.createOrks=function(player_id){
-        this.spawn -= 100;
-        if(!this.spawn){
-            this.spawn = this.spawnInterval*100;
-            var config = findObjectInArray(gameObjects, 'type', "ORK");
-            me.createObject("ORK", player_id, this.coord, config);
-        }
-    }
 
     function cloneObject(me, arr){
         for(var i=0; i<arr.length; i++){
@@ -149,14 +141,30 @@ function World(width, height){
                 var targets = this.getMoveTargets(all_obj);
                 if(targets.length){
                     targets = targets.map(function(t){
-                        return { coord: t.coord, path: me.gameMap.findPathToCoordinate(gameObj.coord, t.coord,all_obj)}
+                        var k = me.gameMap.findPathToCoordinate(gameObj.coord, t.coord,all_obj);
+                     if (k.length==0){}else {
+                         return {coord: t.coord, path: k}
+                     }
                     });
-                    targets.sort(function(a,b){ return a.path.length > b.path.length });
 
-                    if(targets[0].path.length>2) //TODO - надо подумать как сделать красивее
+                    targets.sort(function(a,b){
+                            return a.path.length > b.path.length
+                    });
+                //    console.log(targets.length);
+                    // for (var i=0;i<targets.length;i++){
+                    //     if ((targets[i]) && (targets[0].path.length>targets[i].path.length)){
+                    //         targets[0].path=targets[i].path;
+                    //     }
+                    // }
+                    //
+                    // if (!targets.length){return;}
+
+                    if((targets[0])&&(targets[0].path.length>2)) { //TODO - надо подумать как сделать красивее
                         var newCoordinate = targets[0].path[1];
+                    }
                     else
                         var newCoordinate = this.coord;
+
 
                     this.moveAnimation = [ this.coord, newCoordinate ];
                     this.coord = newCoordinate;
@@ -180,6 +188,7 @@ function World(width, height){
             return targets.filter(function(target){
                 return target.hp!="del";
             });
+
         }
 
         this.attack = function(all_obj){
