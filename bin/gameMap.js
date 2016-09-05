@@ -47,18 +47,26 @@ function GameMap(width, height){
 
 	me.searchPlace=function(i,j,player_id,all){
 		for (var k=0;k<=all.length-1;k++){
-		//	alert(all[k].playerId)
-			if ((all[k].type=="PLACE") && (all[k].coord[0]==i)&&(all[k].coord[1]==j)&&(all[k].playerId==player_id)){
-
+			if ((all[k].type=="PLACE") && (all[k].coord[0]==i)&&(all[k].coord[1]==j)&&(all[k].playerId==player_id)&&(all[k].hp!="del")){
 				return true;
 			}
 		}
 		return false;
 	}
 
+	me.checkToPlace=function(i,j,player_id,all){
+		for (var k=0;k<=all.length-1;k++) {
+			if ((all[k].type=="PLACE")&&(all[k].coord[0]==i)&&(all[k].coord[1]==j)&&(all[k].playerId!=player_id)||((all[j].hp=="del"))){
+				return false;
+			}
+
+		}
+		return true;
+	}
+
 	me.checkPointToFree = function(coord,all_obj,config_block,type,player_id){
 		var i = coord[0]; var j = coord[1];
-		if ((type=="PLACE")&&(((j>0)&&(me.searchPlace(i,j-1,player_id,all_obj)))||((i>0)&&(me.searchPlace(i-1,j,player_id,all_obj)))||((j<height-1)&&(me.searchPlace(i,j+1,player_id,all_obj)))||((i<width-1)&&(me.searchPlace(i+1,j,player_id,all_obj))))){
+		if (me.checkToPlace(i,j,player_id,all_obj)&&(type=="PLACE")&&(((j>0)&&(me.searchPlace(i,j-1,player_id,all_obj)))||((i>0)&&(me.searchPlace(i-1,j,player_id,all_obj)))||((j<height-1)&&(me.searchPlace(i,j+1,player_id,all_obj)))||((i<width-1)&&(me.searchPlace(i+1,j,player_id,all_obj))))){
 			return true;
 		} else if (type=="PLACE") {
 			return false;

@@ -110,6 +110,7 @@ function World(width, height){
         this.attackTarget = false;
         cloneObject(this, [config]);
         if (!this.attackOrHeal){this.attackOrHeal=false;}
+        if (!this.capture){this.capture=[{target:"CASTLE",change:"CASTLE"}];}
         this.maxHp=this.hp;
 
         // this.hp=config.hp;
@@ -142,22 +143,28 @@ function World(width, height){
                 if(targets.length){
                     targets = targets.map(function(t){
                         var k = me.gameMap.findPathToCoordinate(gameObj.coord, t.coord,all_obj);
-                     if (k.length==0){}else {
+                     if (k.length!=0){
                          return {coord: t.coord, path: k}
                      }
                     });
 
-                    targets.sort(function(a,b){
-                            return a.path.length > b.path.length
+                    targets = targets.filter(function(target){
+                        return target!==undefined;                  // ГОВНОКОД
                     });
-                //    console.log(targets.length);
-                    // for (var i=0;i<targets.length;i++){
-                    //     if ((targets[i]) && (targets[0].path.length>targets[i].path.length)){
-                    //         targets[0].path=targets[i].path;
-                    //     }
-                    // }
-                    //
-                    // if (!targets.length){return;}
+
+                       //console.log(targets)
+
+                        for (var i = 0; i < targets.length; i++) {
+                            if ((targets[i]) && (targets[0].path.length > targets[i].path.length)) {
+                                targets[0].path = targets[i].path;
+                            }
+                        }
+
+
+                     // targets.sort(function(a,b){
+                     //      return a.path.length > b.path.length;
+                     // });
+
 
                     if((targets[0])&&(targets[0].path.length>2)) { //TODO - надо подумать как сделать красивее
                         var newCoordinate = targets[0].path[1];
@@ -219,20 +226,30 @@ function World(width, height){
 
 
                     if ((target.hp<=0)&&(this.attackOrHeal==false)){
-                        //if (target.type=="CASTLE") {dieAllObject(target.player_id);}
+                        var swap = findObjectInArray(this.capture, "target", target.type);
                         target.hp="del";
                         var kar=0;
-                        for (var i=0;i<=all_obj.length-1;i++){
-                            if ((all_obj.type=="CASTLE")&&(all_obj[i].playerId==target.playerId) && (target.hp!="del")){
-                                kar=1;
-                            }
+
+                        switch (swap.target) {
+                            case "CASTLE" : // Уничтожение замка - main событие в игре, так что это не говнокод
+                                for (var i = 0; i <= all_obj.length - 1; i++) {
+                                    if ((all_obj.type == swap.target) && (all_obj[i].playerId == target.playerId) && (target.hp != "del")) {
+                                        kar = 1;
+                                    }
+                                }
+
+                                if ((target.type == swap.target) && (kar != 1)) {
+                                    me.delObjectsById(target.playerId);
+                                    me.createObject(swap.change, this.playerId, target.coord);
+                                }
+                                break;
+
+                            default:
+                                me.createObject(swap.change, this.playerId, target.coord);
+                                break;
                         }
 
-                        if ((target.type=="CASTLE") && (kar!=1)){
-                            me.delObjectsById(target.playerId);
-                           // event.push({event:"die",type:"CASTLE",player:target.name});
-                            me.createObject('CASTLE', this.playerId, target.coord);
-                        }
+
 
                         var player = findObjectInArray(players, 'id', gameObj.playerId);
                         if (player) player.gold += target.price/4;
@@ -328,9 +345,9 @@ function World(width, height){
             }
         });
     }
-    me.delObjectsById = function(player_id){
+    me.delObjectsById = function(playerId){
         for (var i=0;i<=all_obj.length-1;i++){
-            if (all_obj[i].playerId==player_id){
+            if (all_obj[i].playerId==playerId){
                 all_obj[i].hp="del";
             }
         }

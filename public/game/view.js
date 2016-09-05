@@ -125,7 +125,10 @@ function VIEW(){
 		'BANK': 'BANK.png',
 		'KAMIKADZE': 'KAMIKADZE.png',
 		'HEALMAN':'healman.png',
-		'spawnerOrks':"spawnerOrks.png"
+		'spawnerOrks':"spawnerOrks.png",
+		'SKELETON':'skeleton.png',
+		'CHEN':'chen.png',
+		'PIRATE':'pirate.png'
 	};
 
 	var colors = [
