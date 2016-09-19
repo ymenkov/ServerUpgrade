@@ -4,9 +4,39 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" type="text/css" href="style.css">
   <script src="controller.js" defer></script>
- <script src="view.js" defer></script>
+    <script src="canvas.js" defer></script>
+    <script>
+        window.onload = function() {
+            loadImages();
+            document.getElementById('canvas').width = WIDTH;
+            document.getElementById('canvas').height = HEIGTH;
+
+            socket.onmessage = function(event) {
+
+                var response = JSON.parse(event.data);
+
+                if (response.type == "EVENT"){
+                    alert(response.info);
+                    return;
+                }
+
+                if (response.type == "INFO"){
+                    priceObjects(response.config);
+                    console.log("INFO_PACKET");
+                    return;
+                }
+                console.log("PACKET_REACHED");
+             //   console.log(response);
+                getObjectsInfo(response);
+             //   console.log(response);
+
+            };
+            start();
+        }
+    </script>
 </head>
 <body>
+<canvas height='1000' width='1000' id='canvas' onclick="onClick();" oncontextmenu="rightClick();">Обновите браузер</canvas>
 <div id='test'></div>
 <div id='pic'></div>
 <div id="ololo"></div>
@@ -14,13 +44,19 @@
     <span id='Gold'>Gold : 20</span>
     <span id='player'>Имя: </span>
     <span id='castle'>Здоровье замка: </span>
-    <input type="button" onclick="v.start_game();" value="Начать игру / скорость++"/>
+    <input type="button" onclick="start_game();" value="Начать игру / скорость++"/>
+    <input type="button" onclick="testSkill();" value="121212"/>
 
     <hr>
     <hr>
 </div>
-<select id="listbox" size="5">
-</select>
+<div id="infobox" >
+    <img id="hero" src="" width="300px" height="300px">
+    <div id="skills"></div>
+    <div id="lvl"></div>
+    <div id="toggle"></div>
+</div>
+<div id="results" class="descr">
 </body>
 
 </html>

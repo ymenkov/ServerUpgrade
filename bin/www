@@ -118,10 +118,8 @@ webSocketServer.on('connection', function(ws) {
     console.dir(players);
     var playerId = getPlayerIdbyIp(ws.upgradeReq.connection.remoteAddress);
     var clientId = clients.push({ws: ws, playerId: playerId });
-
   console.log("новое соединение " + playerId + " : " + clientId);
     ws.send(JSON.stringify({type:"INFO",config:gameObjects}));
-
 
 
   ws.on('message', function(message) {
@@ -131,19 +129,27 @@ webSocketServer.on('connection', function(ws) {
           case 'start':
               if(playerId === 0)
                 w.startWorld();
-
                     for (var i=0;i<=clients.length-1;i++){
                     clients[i].ws.send(JSON.stringify({type:"EVENT",info:"Игра начала / ускорилась"}));
                     }
               break;
 
           case 'create':
-              if(w.worldStart && playerId == mes.playerId)
-                  console.log(123)
+              if(w.worldStart && (playerId == mes.player_id))
                   w.buyObject(mes.type,mes.player_id,mes.coord);
               break;
           case 'up':
+              if(w.worldStart && (playerId == mes.player_id))
               w.upLvl(mes);
+              break;
+          case 'control':
+              if(w.worldStart && (playerId == mes.player_id))
+              w.changeControl(mes);
+              break;
+          case 'useSkill':
+              console.log(playerId+"asd"+mes.player_id)
+              if(w.worldStart && (playerId == mes.player_id))
+              w.useSkill(mes);
               break;
       }
   });
@@ -161,8 +167,6 @@ webSocketServer.on('connection', function(ws) {
 });
 
 w = new wor.World(12,20);
-// w.createPlayer("Инокентий", 0);
-// w.createPlayer("222222", 1);
 console.log("Серевер работает 8081");
 
 setInterval(function () {

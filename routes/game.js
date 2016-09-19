@@ -18,7 +18,8 @@ router.post('/', function (req, res,next) {
         return;
     }
     res.send(JSON.stringify(playerId));
-    w.createPlayer(req.body.username, playerId);
+    w.createPlayer(req.body.username, playerId,req.body.hero);
+
     players.push( { id: playerId, ip: req.connection.remoteAddress.replace('::ffff:', '') } );
     playerId=playerId+1;
 });

@@ -4,16 +4,7 @@ var gameObjects = require('./gameConfig');
 
 function World(width, height){
 
-    this.setAllObj=function(){
-        return all_obj;
-    }
-
-    this.setPlayers=function(){
-        return players;
-    }
-
     var me = this;
-    var event = [];
     var all_obj = [];
     var players = [];
    // var playerId = 0;
@@ -35,7 +26,10 @@ function World(width, height){
                 hp: obj.hp,
                 attackTarget: obj.attackTarget,
                 moveAnimation: obj.moveAnimation,
-                lvlInfo: obj.lvlInfo
+                lvlInfo: obj.lvlInfo,
+                maxHp:obj.maxHp,
+                skills : obj.skills,
+                control : obj.control
             }
         })
 
@@ -51,21 +45,18 @@ function World(width, height){
 
     me.getPlayers = function(){ return players }
 
-    me.createPlayer = function(name, player_id){
+    me.createPlayer = function(name, player_id,hero){
         var new_player = {
             type: "PLAYER",
             die: false,
             id: player_id,
             name: name,
             coord:thrones[player_id],
-            tow:2,
-            place:2,
-            wall:3,
             gold:3000,
         };
-
         players.push(new_player);
         me.createObject('CASTLE', new_player.id, thrones[new_player.id]);
+      // me.createObject(hero, new_player.id, thrones[new_player.id]);
         this.buildCastle(thrones[new_player.id],new_player.id);
     };
 
@@ -107,26 +98,14 @@ function World(width, height){
         this.type=type; // тип объекта
         this.coord=coordinate; // координаты объекта
         this.playerId = playerId;
-        this.attackTarget = false;
+        this.attackTarget = false; // id атакуемого объекта
         cloneObject(this, [config]);
-        if (!this.attackOrHeal){this.attackOrHeal=false;}
-        if (!this.capture){this.capture=[{target:"CASTLE",change:"CASTLE"}];}
-        this.maxHp=this.hp;
-
-        // this.hp=config.hp;
-        // this.moveTargets=config.moveTargets;
-        // this.attackTargets=config.attackTargets || [];
-        // this.damage=config.damage;
-        // this.moveSpeed=config.moveSpeed;
-        // this.attackSpeed=config.attackSpeed;
-        // this.attackRadius = config.attackRadius;
-        // this.attackTarget = false;
-        // this.block=config.block;
-        // this.spawnInterval = config.spawnInterval || 0;
-        // this.price = config.price;
-        // this.lvlInfo=config.lvlInfo;
-
-
+        if (!this.attackOrHeal){this.attackOrHeal=false;} // объект либо хилит, либо дамажит. По умолчанию дамажит
+        if (!this.capture){this.capture=[{target:"CASTLE",change:"CASTLE"}];} // по умолчанию только на месте разрушенного замка появляется новый замок
+        if (!this.control){this.control={status:"auto",coord:[],radius:this.attackRadius};} // объект двигается автоматически
+        if (!this.skills){this.skills=false;}
+        if (!this.targetNumb){this.targetNumb=1;}
+        this.maxHp=this.hp; // Максимальное hp введено из-за up lvl
 
         this.attackCoolDown = (1000/this.attackSpeed).toFixed(0);
         this.moveCoolDown = (1000/this.moveSpeed).toFixed(0);
@@ -152,21 +131,13 @@ function World(width, height){
                         return target!==undefined;                  // ГОВНОКОД
                     });
 
-                       //console.log(targets)
-
                         for (var i = 0; i < targets.length; i++) {
                             if ((targets[i]) && (targets[0].path.length > targets[i].path.length)) {
                                 targets[0].path = targets[i].path;
                             }
                         }
 
-
-                     // targets.sort(function(a,b){
-                     //      return a.path.length > b.path.length;
-                     // });
-
-
-                    if((targets[0])&&(targets[0].path.length>2)) { //TODO - надо подумать как сделать красивее
+                    if((targets[0])&&(targets[0].path.length>this.control.radius)) { //TODO - надо подумать как сделать красивее
                         var newCoordinate = targets[0].path[1];
                     }
                     else
@@ -183,6 +154,11 @@ function World(width, height){
 
         this.getMoveTargets = function(all_obj){
             var targets = [];
+            if (this.control.status=="hand"){
+                targets.push({coord: this.control.coord, hp: 1});
+               if (targets[0].coord===false){return [];}
+                return targets;
+            }
             if(!this.moveTargets)return [];
             for(var i =0; i<all_obj.length; i++) {
                 if (~this.moveTargets.indexOf(all_obj[i].type) && ((this.playerId != all_obj[i].playerId) != this.attackOrHeal)) {
@@ -197,13 +173,12 @@ function World(width, height){
             });
 
         }
-
         this.attack = function(all_obj){
             var gameObj = this;
             this.attackCoolDown -= 100;
             if(!this.attackCoolDown){
                 this.attackCoolDown = (1000/this.attackSpeed).toFixed(0);
-                var attackTargets=gameObj.getAttackTarget(all_obj,gameObj.attackTargets,gameObj.attackRadius,1,gameObj.coord);
+                var attackTargets=gameObj.getAttackTarget(all_obj,gameObj.attackTargets,gameObj.attackRadius,this.targetNumb,gameObj.coord,this.attackOrHeal);
 
                 attackTargets.forEach(function(target){
 
@@ -225,7 +200,7 @@ function World(width, height){
                      //heal end
 
 
-                    if ((target.hp<=0)&&(this.attackOrHeal==false)){
+                    if ((target.hp<=0)&&(!this.attackOrHeal)){
                         var swap = findObjectInArray(this.capture, "target", target.type);
                         target.hp="del";
                         var kar=0;
@@ -283,8 +258,81 @@ function World(width, height){
         }
 
 
+// **************SKILLS************************
+        this.skillsCoolDown=function(all_obj){
+            if (this.skills==false){return;}
+            for (var i=0;i<this.skills.length;i++){
+                if ((this.skills[i].type=="active")&&(this.skills[i].nowCoolDown<this.skills[i].coolDown)){
+                    this.skills[i].nowCoolDown+=1;
+                }
+                if (this.skills[i].type=="passive"){
+                    me.useSkill({id:this.id,skill:this.skills[i].skill});
+                }
+            }
+        }
 
-        this.getAttackTarget = function(all_obj,attackTypes,radius,targetNumb,coord){
+
+        this.vortex=function(skill){ // Активируемая способность, атакует всех противников в радиусе
+            if (!this.skills) {return;}
+            var gameObj = this;
+            var attackTargets=gameObj.getAttackTarget(all_obj,gameObj.attackTargets,skill.radius,"all",gameObj.coord,false);
+            attackTargets.forEach(function(target){
+                if (target.hp!="del") {
+                    target.hp -= skill.damage;
+                }
+                if (target.hp<=0){
+                    target.hp="del";
+                }
+            }.bind(this));
+        }
+
+        this.radiance=function(skill){ // // Пассивная способность, атакует всех противников в радиусе
+            if (!this.skills) {return;}
+            var gameObj = this;
+            var attackTargets=gameObj.getAttackTarget(all_obj,gameObj.attackTargets,skill.radius,"all",gameObj.coord,false);
+            attackTargets.forEach(function(target){
+                if (target.hp!="del") {
+                    target.hp -= skill.damage;
+                }
+                if (target.hp<=0){
+                    target.hp="del";
+                }
+            }.bind(this));
+        }
+
+        this.forceStaff=function(skill){ // Активируемая способность, ускоряет объект
+            if (!this.skills) {return;}
+            for (var i=0;i<skill.speed;i++) {
+                this.moveCoolDown = 100;
+                this.move(all_obj);
+            }
+        }
+
+        this.mine=function(skill){
+            if (!this.skills) {return;}
+            var gameObj = this;
+            var attackTargets=gameObj.getAttackTarget(all_obj,gameObj.attackTargets,skill.radius,"all",gameObj.coord,false);
+            attackTargets.forEach(function(target){
+                if (target.hp!="del") {
+                    target.hp -= skill.damage;
+                    gameObj.hp="del";
+                }
+                if (target.hp<=0){
+                    target.hp="del";
+                }
+            }.bind(this));
+        }
+
+        this.spawnMob=function(skill){
+            if (!this.skills) {return;}
+            me.createObject(skill.object, this.playerId, this.coord);
+        }
+
+
+
+// **************SKILLS END************************
+
+        this.getAttackTarget = function(all_obj,attackTypes,radius,targetNumb,coord,attackOrHeal){
             var gameObj = this;
 
             if(!attackTypes.indexOf)return [];
@@ -292,6 +340,12 @@ function World(width, height){
             targets = all_obj.filter(function(target){
                 return ~attackTypes.indexOf(target.type);
             })
+            ///
+            // if ((this.control.status=="hand")&&(this.control.target!=false)){
+            //     var object = findObjectInArray(all_obj, 'id', this.control.target);
+            //     targets[0]=object;
+            // }
+            ///
             targets = targets.filter(function(target){
                 if (((Math.abs(target.coord[0]-coord[0]))<radius)&&((Math.abs(target.coord[1]-coord[1]))<radius)){
                     return true;
@@ -299,14 +353,11 @@ function World(width, height){
                 return false;
             })
             targets = targets.filter(function(target){
-                if ((gameObj.attackOrHeal==true)&&(gameObj.hp>=gameObj.maxHp)){
-                    return [];
-                }
-                return (target.hp!="del" && ((target.playerId!=gameObj.playerId)!=gameObj.attackOrHeal));
+                return (target.hp!="del" && ((target.playerId!=gameObj.playerId)!=attackOrHeal));
             })
+            if (targetNumb=="all"){return targets;}
             return targets.slice(0,targetNumb);
         }
-
 
     }
 
@@ -342,6 +393,7 @@ function World(width, height){
                 game_Object.attack.call(game_Object, all_obj);
                 game_Object.spawnObjects.call(game_Object, all_obj);
                 game_Object.craft.call(game_Object, all_obj)
+                game_Object.skillsCoolDown.call(game_Object, all_obj);
             }
         });
     }
@@ -402,9 +454,26 @@ function World(width, height){
             if (mes.upgrade=="hp"){object["maxHp"]=object["maxHp"]+number.step;} //говноКод
 
             object[mes.upgrade]=object[mes.upgrade]+number.step;
-            console.log(object.id)
         }
 
+    }
+
+    me.changeControl=function(mes){
+        var object = findObjectInArray(all_obj, 'id', mes.id);
+        if (mes.player_id!=object.playerId){return;}
+        if (object.control.status==mes.status){
+            object.control.radius = 1;
+            object.control.coord = mes.coord;
+        }
+    }
+
+    me.useSkill=function(mes){
+        var object = findObjectInArray(all_obj, 'id', mes.id);
+        var skill = findObjectInArray(object.skills, "skill", mes.skill);
+        if (skill.nowCoolDown==skill.coolDown){
+            object[mes.skill](skill);
+            skill.nowCoolDown=0;
+        }
     }
 
     /////////////////////////

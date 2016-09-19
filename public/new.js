@@ -3,7 +3,7 @@ function signIn(){
 	var val = text.value;
 
 	var xhr = new XMLHttpRequest();
-	var body = 'username='+val;
+	var body = 'username='+val+'&hero=TITAN';
 	xhr.open("POST", 'http://' + window.location.host + '/game');
 	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
 	xhr.send(body);

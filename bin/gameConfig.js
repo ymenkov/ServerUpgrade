@@ -31,7 +31,7 @@ module.exports = [{
 	"hp": 1000,
 	"price": 200,
 	"moveTargets": ["CASTLE", "HUNTER","ORK", "TROLL","HEALMAN","WALL","CHEN","SKELETON","PIRATE"],
-	"attackTargets": ["CASTLE", "HUNTER","ORK", "TROLL","HEALMAN","WALL","CHEN","SKELETON","PIRATE"],
+	"attackTargets": ["CASTLE", "HUNTER","ORK", "TROLL","HEALMAN","WALL","CHEN","SKELETON","PIRATE","TOWER"],
 	"damage": 50,
 	"moveSpeed": 1,
 	"attackSpeed": 1,
@@ -186,4 +186,36 @@ module.exports = [{
 	"attackRadius": 2,
 	"block": false,
 	"capture": [{target:"PLACE",change:"PLACE"}]
+},{
+	"type": "TITAN",
+	"hp": 50,
+	"price": 1,
+	"moveTargets": ["ORK"],
+	"attackTargets": ["ORK"],
+	"damage": 1,
+	"moveSpeed": 10,
+	"attackSpeed": 1,
+	"attackRadius": 4,
+	"block": false,
+	"control":{status:"hand",coord:false,radius:1,target:false},
+	"skills":[
+		{skill:"vortex",type:"active", damage:10000,radius:5,nowCoolDown:60,coolDown:60},
+		{skill:"radiance",type:"passive",damage:20,radius:2,nowCoolDown:0,coolDown:0},
+		{skill:"forceStaff",type:"active",speed:3,nowCoolDown:20,coolDown:20},
+		{skill:"spawnMob",type:"active",object:"BOMB",nowCoolDown:20,coolDown:20}
+	]
+},{
+	"type": "BOMB",
+	"hp": 10000,
+	"price": 0,
+	"moveTargets": false,
+	"attackTargets": ["ORK"],
+	"damage": 25,
+	"moveSpeed": 1,
+	"attackSpeed": 1,
+	"attackRadius": 2,
+	"block": false,
+	"skills":[
+		{skill:"mine",type:"passive",radius:1,damage:10000,nowCoolDown:0,coolDown:0}
+	]
 }];

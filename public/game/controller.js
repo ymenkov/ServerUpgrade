@@ -1,6 +1,7 @@
 var statusController=0;
 var select;
 var selectForUpgrade;
+var selectForControl={id:false,target:false};
 
 function CONTROLLER(width, height) {
 	function Obr(make, type, coord, plyaer_id) {

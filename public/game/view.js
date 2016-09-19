@@ -145,13 +145,22 @@ function VIEW(){
 				if (searchPlace(i,j)) {
 					elem.style.backgroundColor = "rgb(128, 128, 128)";
 				}
-				
+
 				elem.style.left = (j*hw + marg*j) + 'px';
 				elem.style.top = (i*hw + marg*i) + 'px';
 				elem.style.border = 'outset';
 				masM[i][j] = elem;
 				//document.getElementById('test')
 				elem.onclick = c.kappa;
+				elem.oncontextmenu=m5.bind([i,j]);
+
+					function m5(){
+					//var newUp = new up("up",selectForUpgrade.id,this.upgrade,player_id);
+					//	alert(selectForControl.id)
+						socket.send(JSON.stringify({make:"control",status:"hand",id:selectForControl.id,target:selectForControl.target,coord:this,playerId:player_id}));
+						document.oncontextmenu = function (){return false};
+
+					}
 				//console.log(elem);
 				document.getElementById('test').appendChild(elem);
 			}
@@ -197,11 +206,18 @@ function VIEW(){
 		 	renderElem = document.createElement('div');
 		 	renderElem.className = 'game-object';
 		 	renderElem.style.transition="all 1s";
-				if (object.lvlInfo) {
-					renderElem.onclick = upLVL.bind(object);
-				}
+			renderElem.onclick = upLVL.bind(object);
+			renderElem.ondblclick=dblClick.bind(object);
+			function dblClick(){
+				selectForControl.target=object.id;
+				socket.send(JSON.stringify({make:"control",status:"hand",id:selectForControl.id,target:selectForControl.target,coord:this,playerId:player_id}));
+			}
 
 			function upLVL(){
+				if (!object.lvlInfo) {
+					selectForControl.id=object.id;
+					return;
+				}
 				selectForUpgrade={id:this.id};
 				var elem=document.getElementById("listbox");
 				elem.innerHTML="";
@@ -358,6 +374,10 @@ this.start_game=function(){
 	var newTower = new Obr("start","TOWER",[1,1],23)
 	socket.send(JSON.stringify(newTower));
 
+}
+
+this.testSkill=function(){
+	socket.send(JSON.stringify({make:"useSkill",skill:"forceStaff",id:123,playerId:player_id}));
 }
 
 this.buy_hunter=function(){
