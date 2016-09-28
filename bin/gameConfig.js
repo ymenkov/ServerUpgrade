@@ -192,18 +192,20 @@ module.exports = [{
 	"price": 1,
 	"moveTargets": ["ORK"],
 	"attackTargets": ["ORK"],
-	"damage": 1,
-	"moveSpeed": 10,
+	"damage": 10,
+	"moveSpeed": 1,
 	"attackSpeed": 1,
 	"attackRadius": 4,
 	"block": false,
+	"targetNumb":5,
 	"control":{status:"hand",coord:false,radius:1,target:false},
 	"skills":[
-		{skill:"vortex",type:"active", damage:10000,radius:5,nowCoolDown:60,coolDown:60},
+		{skill:"vortex",type:"active", damage:10000,radius:5,nowCoolDown:10,coolDown:10},
 		{skill:"radiance",type:"passive",damage:20,radius:2,nowCoolDown:0,coolDown:0},
 		{skill:"forceStaff",type:"active",speed:3,nowCoolDown:20,coolDown:20},
 		{skill:"spawnMob",type:"active",object:"BOMB",nowCoolDown:20,coolDown:20}
-	]
+	],
+	"lvlInfo":[{"lvl": 1,"upgrade": "attackRadius","step": 1,"maxLvl": 10,"price": 300},{"lvl": 1,"upgrade": "hp","step": 1000,"maxLvl": 5,"price": 300}]
 },{
 	"type": "BOMB",
 	"hp": 10000,

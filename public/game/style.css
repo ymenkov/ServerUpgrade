@@ -212,6 +212,11 @@ select {
 #hero {
 	border: 1px solid grey;
 }
+#lvl{
+	display : inline-block;
+	vertical-align:top;
+}
+
 .menu1:hover { background: rgb(232,95,76); }
 .menu1:active { background: rgb(152,15,0); }
 

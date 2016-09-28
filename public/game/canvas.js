@@ -9,6 +9,7 @@ const PIXEL_PER_RENDER = CELL_WIDTH / FRAMES_PER_SECOND;
 
 ////
 var selectForControl = {id: undefined,idNow:undefined};
+var events=[];
 ////
 
 var GImg = {};
@@ -34,7 +35,11 @@ var images = {
 	'HEALMAN': 'healman.png',
 	'spawnerOrks': "spawnerOrks.png",
 	"TITAN": "titan.jpg",
-	"BOMB":"bomb.png"
+	"BOMB":"bomb.png",
+	"fireball":"fireball.png",
+	"TITAN-SHOT":"titan-shot.png",
+	"ST-SHOT":"st-shot.png"
+
 };
 
 function loadImages() {
@@ -116,10 +121,7 @@ function onClick() {
 	var y = event.pageY - document.body.style.marginTop;
 	var Ids = checkCoord(x, y);
 
-	if (Ids.length) {
-		selectForControl.id = Ids[Ids.length - 1];
-		return;
-	}
+
 
 	if (GCreateObject != null) {
 		var nObr = new Obr("create", GCreateObject, [pixelToCellX(y), pixelToCellX(x)], player_id);		//----- FIX cX to cY if CELL_HEIGHT != CELL_WIDTH
@@ -127,7 +129,10 @@ function onClick() {
 		GCreateObject = null;
 		return;
 	}
-
+	if (Ids.length) {
+		selectForControl.id = Ids[Ids.length - 1];
+		return;
+	}
 
 }
 
@@ -158,7 +163,7 @@ function checkCoord(x, y) {
 	for (var i = 0; i < GObjects.length - 1; i++) {
 		oX = X(GObjects[i]);
 		oY = Y(GObjects[i]);
-		if (x >= oX && x <= oX + CELL_WIDTH && y >= oY && y <= oY + CELL_HEIGTH) {
+		if (x >= oX && x <= oX + CELL_WIDTH && y >= oY && y <= oY + CELL_HEIGTH && GObjects[i].type!="PLACE") {
 			AIds.push(GObjects[i].id);
 		}
 	}
@@ -214,13 +219,13 @@ function getObjectsInfo(_response) {
 
 	for (var i = 0; i < _response.length; i++) {
 
-		/// вывод инфы
+		/// вывод скиллов
 		if ((_response[i].id)&&(selectForControl.id) && (_response[i].id==selectForControl.id)){
 			document.getElementById('hero').src=images[_response[i].type];
 			var elemSkills = document.getElementById('skills');
+			var elemLvl = document.getElementById('lvl');
 			if ((_response[i].skills)&&(selectForControl.idNow!=_response[i].id)){
 				elemSkills.innerHTML="";
-				selectForControl.idNow=_response[i].id;
 				for (var k=0;k<_response[i].skills.length;k++) {
 					var buttonSkills = document.createElement("input");
 					switch (_response[i].skills[k].type){
@@ -229,7 +234,9 @@ function getObjectsInfo(_response) {
 							buttonSkills.disabled = true;
 							break;
 						case "active":
-						//	buttonSkills.style.background="linear-gradient(to right, black 50%, red 50%)";
+							var cd = _response[i].skills[k].coolDown;
+							var cdNow= Math.floor((_response[i].skills[k].nowCoolDown/cd)*100);
+							buttonSkills.style.background="linear-gradient(to right, black "+cdNow+"%, red "+cd+"%)";
 							break;
 					}
 					buttonSkills.className = "menu1";
@@ -242,9 +249,51 @@ function getObjectsInfo(_response) {
 					elemSkills.appendChild(buttonSkills);
 
 				}
+			} else if (!_response[i].skills){
+				elemSkills.innerHTML="";
+			} else if ((selectForControl.idNow==_response[i].id) && (_response[i].skills)){
+				for (var j = 0; j < elemSkills.childNodes.length; j++) {
+					var cd = _response[i].skills[j].coolDown;
+					var cdNow= Math.floor((_response[i].skills[j].nowCoolDown/cd)*100);
+					cd = 100-cdNow;
+					elemSkills.childNodes[j].style.background="linear-gradient(to right, black "+cdNow+"%, red "+cd+"%)";
+				}
 			}
+			///вывод скиллов end
+			// вывод лвлов
+
+			if ((_response[i].lvlInfo)&&(selectForControl.idNow!=_response[i].id)){
+				elemLvl.innerHTML="";
+				//selectForControl.idNow=_response[i].id;
+				for (var k=0;k<_response[i].lvlInfo.length;k++) {
+					var buttonSkills = document.createElement("input");
+					buttonSkills.className = "menu1";
+					buttonSkills.type = "button";
+					buttonSkills.value=_response[i].lvlInfo[k].upgrade + " "+_response[i].lvlInfo[k].lvl;
+					buttonSkills.onclick=useSkill.bind(_response[i].lvlInfo[k].upgrade);
+					function useSkill(){
+						socket.send(JSON.stringify({make:"up",upgrade:this,id:selectForControl.idNow,player_id:player_id}));
+					}
+					elemLvl.appendChild(buttonSkills);
+
+				}
+			} else if (!_response[i].lvlInfo){
+				elemLvl.innerHTML="";
+			} else if ((selectForControl.idNow==_response[i].id) && (_response[i].lvlInfo)){
+				for (var j = 0; j < elemLvl.childNodes.length; j++) {
+					elemLvl.childNodes[j].value=_response[i].lvlInfo[j].upgrade + " "+_response[i].lvlInfo[j].lvl+'/'+_response[i].lvlInfo[j].maxLvl;
+					if (_response[i].lvlInfo[j].lvl==_response[i].lvlInfo[j].maxLvl){
+						elemLvl.childNodes[j].style.background="green";
+						elemLvl.childNodes[j].disabled = true;
+					}
+				}
+			}
+			// вывод лвлов end
+			selectForControl.idNow=_response[i].id;
 		}
-		///вывод инфы end
+
+
+
 
 		if (_response[i].type != 'PLACE' && _response[i].type != 'CASTLE' && _response[i].type != 'BLOCK' && _response[i].type != 'PLAYER') {
 			//debugger;
@@ -308,6 +357,7 @@ function renderMap() {
 function start() {		// Start rendering map cycle
 	var Interval = setInterval(function () {
 		renderMap();
+		animationEvents();
 		GAnimationCount++;
 		/*if (GAnimationCount == FRAMES_PER_SECOND){
 		 clearAnimation();
@@ -392,10 +442,85 @@ function drawHP(game_object) {
 	var HP = (game_object.hp / game_object.maxHp) * (CELL_WIDTH - 8);
 	GMap.fillStyle = "#00ff40";
 	GMap.fillRect(x + 4, yPos, HP, 4);
-	//GMap.strokeRect(x + 4, yPos, CELL_WIDTH - 8, 4)
 }
-function testSkill(){
-	socket.send(JSON.stringify({make:"useSkill",skill:"spawnMob",id:selectForControl.id,player_id:player_id}));
+
+function animationEvents(){
+	for(var j=0;j<events.length;j++) {
+		switch (events[j].make) {
+			case "shot" :
+				shots(j);
+				break;
+			case "vortex":
+				vortex(j);
+				break;
+		}
+
+	}
+}
+
+function vortex(j){
+	var object = findProp(GObjects, 'id', events[j].id);
+	var diametr  = events[j].radius*2-1;
+	var radius = events[j].radius-1;
+	var coord = [object.coord[0]-radius,object.coord[1]-radius];
+	GMap.strokeStyle = "#FF8C00";
+	GMap.lineWidth=10;
+	GMap.strokeRect(X({coord:coord}),Y({coord:coord}), (50+6)*diametr-6, (50+6)*diametr-6);
+	GMap.lineWidth=1;
+	events[j].radius-=0.2;
+	if (events[j].radius<=0.5){
+		events.splice(j,1);
+	}
+}
+
+function shots(j){
+	var target = findProp(GObjects, 'id', events[j].idB);
+	if ((!target)||(!target.coord)){
+		events.splice(j,1);
+		return;
+	}
+	var A = events[j].coordA;
+	var B = [X({coord:target.coord}),Y({coord:target.coord})];
+	var max = Math.floor(Math.sqrt(Math.pow((B[0]-A[0]),2)+Math.pow((B[1]-A[1]),2))*0.1);
+	var coef = 1;
+	if ((coef>=max)||!B){
+		events.splice(j,1);
+		return;
+	}
+	events[j].coordA = giveCoord(coef,max,events[j].coordA,B);
+
+	if (images[events[j].type+"-SHOT"]){
+		var img = document.getElementById(events[j].type+"-SHOT");
+	} else {
+		var img = document.getElementById("fireball");
+	}
+	GMap.drawImage(img, events[j].coordA[0]+14, events[j].coordA[1]+14, 20, 20);
+}
+
+function giveCoord(coef,max,A,B){
+	var lambda,x,y;
+	lambda = coef / (max - coef);
+	x = (A[0] + lambda * B[0]) / (1 + lambda);
+	y = (A[1] + lambda * B[1]) / (1 + lambda);
+	return [x,y];
+}
+
+function addInEvents(config){
+	for (var i=0;i<config.length;i++){
+		var object = findProp(GObjects, 'id', config[i].from);
+		switch(config[i].type) {
+			case "shot":
+				var target = findProp(GObjects, 'id', config[i].to);
+				if ((!target) || (!object) || (!target.coord) || (!object.coord))return;
+				var A = [X({coord: object.coord}), Y({coord: object.coord})];
+				events.push({make:"shot",coordA: A, idB: target.id, type: object.type});
+				break;
+			case "vortex":
+				events.push({make:"vortex",id:object.id,radius:config[i].radius});
+				break;
+		}
+	}
+	console.log(events);
 }
 
 

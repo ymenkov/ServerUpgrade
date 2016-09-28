@@ -147,7 +147,6 @@ webSocketServer.on('connection', function(ws) {
               w.changeControl(mes);
               break;
           case 'useSkill':
-              console.log(playerId+"asd"+mes.player_id)
               if(w.worldStart && (playerId == mes.player_id))
               w.useSkill(mes);
               break;
@@ -182,5 +181,22 @@ setInterval(function () {
         }
     });
 }, 300);
+
+setInterval(function () {
+    clients.forEach(function (client, clientId) {
+        try {
+            if (client.ws && client.ws.send) {
+                if (w.events.length) {
+                    client.ws.send(JSON.stringify({type: "events", config: w.events}));
+                }
+            }
+        } catch(e){
+            client.ws.close();
+            clients.splice(clientId, 1);
+            console.error(e.message);
+        }
+    });
+    w.events = [];
+}, 100);
 
 

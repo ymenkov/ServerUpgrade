@@ -7,24 +7,23 @@ function World(width, height){
     var me = this;
     var all_obj = [];
     var players = [];
-   // var playerId = 0;
+    me.events=[];  // выстрелы, скиллы и прочая лабудень для клиента
     var timerId = null;
     var id = 0;
-    var thrones=[[1,1],[width-2,height-2],[1,height-2],[width-2,1]]
+    var thrones=[[1,1],[width-2,height-2],[1,height-2],[width-2,1]];
 
     me.gameObjects = gameObjects;
     me.gameMap = new MAP.GameMap(width, height);
 
     me.getAll = function(playerid){
         var player= findObjectInArray(players, 'id', playerid);
-        var rez= all_obj.filter(function(obj){ return obj.hp != 'del' }).map(function(obj){
-            return {
+        var rez= all_obj.filter(function(obj){ return (obj.hp != 'del')}).map(function(obj){
+            return{
                 type: obj.type,
                 id: obj.id,
                 coord: obj.coord,
                 player_id: obj.playerId,
                 hp: obj.hp,
-                attackTarget: obj.attackTarget,
                 moveAnimation: obj.moveAnimation,
                 lvlInfo: obj.lvlInfo,
                 maxHp:obj.maxHp,
@@ -56,7 +55,7 @@ function World(width, height){
         };
         players.push(new_player);
         me.createObject('CASTLE', new_player.id, thrones[new_player.id]);
-      // me.createObject(hero, new_player.id, thrones[new_player.id]);
+       me.createObject(hero, new_player.id, thrones[new_player.id]);
         this.buildCastle(thrones[new_player.id],new_player.id);
     };
 
@@ -193,7 +192,10 @@ function World(width, height){
                          gameObj.attackTarget=false;
                          return;
                      }
-                    gameObj.attackTarget = target.id;
+                  //  gameObj.attackTarget = target.id;
+                    if (this.attackRadius>2) {
+                        me.events.push({type: "shot", from: gameObj.id, to: target.id});
+                    }
                     target.hp-=gameObj.damage;
 
 
@@ -284,6 +286,7 @@ function World(width, height){
                     target.hp="del";
                 }
             }.bind(this));
+            me.events.push({type: "vortex", radius:skill.radius,from:this.id});
         }
 
         this.radiance=function(skill){ // // Пассивная способность, атакует всех противников в радиусе
@@ -308,7 +311,7 @@ function World(width, height){
             }
         }
 
-        this.mine=function(skill){
+        this.mine=function(skill){  // устанавливает мину
             if (!this.skills) {return;}
             var gameObj = this;
             var attackTargets=gameObj.getAttackTarget(all_obj,gameObj.attackTargets,skill.radius,"all",gameObj.coord,false);

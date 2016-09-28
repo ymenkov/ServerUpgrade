@@ -20,6 +20,17 @@
                     return;
                 }
 
+                if (response.type == "EVENT"){
+                    alert(response.info);
+                    return;
+                }
+
+                if (response.type == "events"){
+                   // console.log(response.config);
+                    addInEvents(response.config);
+                    return;
+                }
+
                 if (response.type == "INFO"){
                     priceObjects(response.config);
                     console.log("INFO_PACKET");
